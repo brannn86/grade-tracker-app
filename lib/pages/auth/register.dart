@@ -10,6 +10,14 @@ class RegisterPage extends StatelessWidget {
         title: Text("Register"),
         backgroundColor: Colors.deepOrange,
       ),
+      body: Center(
+        child: ElevatedButton(
+          child: Text("Create Account"),
+          onPressed: () {
+            Navigator.pushNamed(context, '/main');
+          },
+        ),
+      ),
     );
   }
 }

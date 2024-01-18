@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grade_app/pages/auth/register.dart';
-import 'package:grade_app/pages/home.dart';
+import 'package:grade_app/pages/main_navigation.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -16,9 +16,9 @@ class LoginPage extends StatelessWidget {
         child: Column(
           children: [
             ElevatedButton(
-              child: Text("Home Page"),
+              child: Text("Login"),
               onPressed: () {
-                Navigator.pushNamed(context, '/homepage');
+                Navigator.pushNamed(context, '/main');
               },
             ),
             ElevatedButton(
