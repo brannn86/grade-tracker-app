@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAdWiBhtl0HoR1vOR3XWCapYlekPQ190EA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>15610913252</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.gradeApp</string>
+	<key>PROJECT_ID</key>
+	<string>grade-tracker-36c6d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>grade-tracker-36c6d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:15610913252:ios:be2b0d29019fa78b3927f1</string>
+</dict>
+</plist>
