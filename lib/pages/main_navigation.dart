@@ -6,7 +6,7 @@ import 'package:grade_app/pages/list.dart';
 import 'package:grade_app/pages/settings.dart';
 
 class MainNavigation extends StatefulWidget {
-  MainNavigation({super.key});
+  const MainNavigation({super.key});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
@@ -22,20 +22,16 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   final List _pages = [
-    HomePage(),
-    GraphPage(),
-    AddPage(),
-    ListPage(),
-    SettingsPage()
+    const HomePage(),
+    const GraphPage(),
+    const AddPage(),
+    const ListPage(),
+    const SettingsPage()
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
-        title: Text("Home"),
-      ),
       body: _pages[_selectedPage],
       // Home
       bottomNavigationBar: BottomNavigationBar(
@@ -43,7 +39,7 @@ class _MainNavigationState extends State<MainNavigation> {
         onTap: _navigateBottomBar,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(
               Icons.home,
@@ -86,42 +82,6 @@ class _MainNavigationState extends State<MainNavigation> {
         iconSize: 32,
         unselectedItemColor: Colors.grey[600],
         selectedItemColor: Colors.deepOrange,
-      ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            DrawerHeader(
-                child: Icon(
-              Icons.star,
-              size: 48,
-            )),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text("Profile"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/profilepage');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text("Settings"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/settingspage');
-              },
-            ),
-            Spacer(),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/loginpage');
-              },
-            ),
-          ],
-        ),
       ),
     );
   }

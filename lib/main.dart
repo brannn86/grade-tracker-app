@@ -20,24 +20,34 @@ Future<void> main() async {
   runApp(const App());
 }
 
+class NavigationService {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  static Future<void> navigateTo(String routeName) async {
+    await navigatorKey.currentState?.pushNamed(routeName);
+  }
+}
+
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: const LoginPage(),
       routes: {
-        '/main': (context) => MainNavigation(),
-        '/homepage': (context) => HomePage(),
-        '/loginpage': (context) => LoginPage(),
-        '/registerpage': (context) => RegisterPage(),
-        '/profilepage': (context) => ProfilePage(),
-        '/graphpage': (context) => GraphPage(),
-        '/addpage': (context) => AddPage(),
-        '/listpage': (context) => ListPage(),
-        '/settingspage': (context) => SettingsPage(),
+        '/main': (context) => const MainNavigation(),
+        '/homepage': (context) => const HomePage(),
+        '/loginpage': (context) => const LoginPage(),
+        '/registerpage': (context) => const RegisterPage(),
+        '/profilepage': (context) => const ProfilePage(),
+        '/graphpage': (context) => const GraphPage(),
+        '/addpage': (context) => const AddPage(),
+        '/listpage': (context) => const ListPage(),
+        '/settingspage': (context) => const SettingsPage(),
       },
     );
   }
