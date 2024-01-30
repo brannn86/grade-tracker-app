@@ -4,6 +4,7 @@ import 'package:grade_app/pages/graph.dart';
 import 'package:grade_app/pages/home.dart';
 import 'package:grade_app/pages/list.dart';
 import 'package:grade_app/pages/settings.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -12,16 +13,26 @@ class MainNavigation extends StatefulWidget {
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation> {
-  int _selectedPage = 0;
+class _MainNavigationState extends State<MainNavigation>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int selectedPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
 
   void _navigateBottomBar(int index) {
     setState(() {
-      _selectedPage = index;
+      selectedPage = index;
+      _tabController.animateTo(index,
+          duration: const Duration(milliseconds: 250), curve: Curves.easeInOut);
     });
   }
 
-  final List _pages = [
+  final List<Widget> _pages = [
     const HomePage(),
     const GraphPage(),
     const AddPage(),
@@ -32,56 +43,50 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedPage],
+      body: TabBarView(
+          controller: _tabController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: _pages),
       // Home
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedPage,
-        onTap: _navigateBottomBar,
-        type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: GNav(
+        onTabChange: (selectedPage) => _navigateBottomBar(selectedPage),
         backgroundColor: Colors.white,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-            ),
-            label: 'Home',
+        iconSize: 24,
+        gap: 8,
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+        tabMargin: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        tabBackgroundColor: Colors.white,
+        tabActiveBorder: Border.all(color: Colors.black),
+        tabs: const [
+          GButton(
+            icon: Icons.home_outlined,
+            text: 'Home',
           ),
 
           // Graph
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.auto_graph,
-            ),
-            label: 'Graph',
+          GButton(
+            icon: Icons.auto_graph,
+            text: 'Graph',
           ),
 
           // Add
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.add_circle_outline,
-            ),
-            label: 'Add',
+          GButton(
+            icon: Icons.add_circle_outline,
+            text: 'Add',
           ),
 
           // List
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.list,
-            ),
-            label: 'List',
+          GButton(
+            icon: Icons.list,
+            text: 'List',
           ),
 
           // More
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.more_horiz,
-            ),
-            label: 'Settings',
+          GButton(
+            icon: Icons.more_horiz,
+            text: 'More',
           )
         ],
-        iconSize: 32,
-        unselectedItemColor: Colors.grey[600],
-        selectedItemColor: Colors.deepOrange,
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:grade_app/main.dart';
+import 'dart:developer';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,26 +15,28 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
 
-  void _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      try {
-        final email = _emailController.text.trim();
-        final password = _passwordController.text.trim();
-        print('Email: $email, Password: $password');
+  Future<void> _submitForm() async {
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      log('Email: $email, Password: $password');
 
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
-        print('Login Success!');
+      // empty field handler
+      if (email.isEmpty || password.isEmpty) {
+        Fluttertoast.showToast(msg: "Please enter your email and password");
+        return;
+      }
 
-        NavigationService.navigateTo('/main');
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          Fluttertoast.showToast(msg: "User not found!");
-        } else if (e.code == 'wrong-password') {
-          Fluttertoast.showToast(msg: "Wrong password!");
-        }
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      log('Login Success!');
+
+      NavigationService.navigateTo('/main');
+    } on FirebaseAuthException catch (e) {
+      //Fluttertoast.showToast(msg: "$e");
+      if (e.code == 'invalid-credential') {
+        Fluttertoast.showToast(msg: "Invalid credential!");
       }
     }
   }
@@ -66,10 +69,8 @@ class _LoginPageState extends State<LoginPage> {
                       controller: _passwordController,
                       obscureText: true,
                       validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.length < 8) {
-                          return 'Password must be at least 8 characters long';
+                        if (value == null || value.isEmpty) {
+                          return 'Password is incorrect!';
                         }
                         return null;
                       },

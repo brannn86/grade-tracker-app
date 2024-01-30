@@ -1,7 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  Future<void> _logOut() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    try {
+      await auth.signOut();
+      log("Logout Success!");
+    } on FirebaseAuthException catch (e) {
+      log("Logout Failed!: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

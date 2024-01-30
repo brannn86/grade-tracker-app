@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:grade_app/main.dart';
+import 'dart:developer';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -14,29 +15,31 @@ class _RegisterPageState extends State<RegisterPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
 
-  void _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      try {
-        final email = _emailController.text.trim();
-        final password = _passwordController.text.trim();
-        print('Email: $email, Password: $password');
+  Future<void> _submitForm() async {
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      log('Email: $email, Password: $password');
 
-        UserCredential userCredential = await _auth
-            .createUserWithEmailAndPassword(email: email, password: password);
-        print('Login Success!');
-
-        await NavigationService.navigateTo('/main');
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          Fluttertoast.showToast(msg: "Password provided is too weak!");
-        } else if (e.code == 'email-already-in-use') {
-          Fluttertoast.showToast(msg: "Wrong password!");
-        }
-      } catch (e) {
-        print(e);
+      // empty field handler
+      if (email.isEmpty || password.isEmpty) {
+        Fluttertoast.showToast(msg: "Please enter your email and password");
+        return;
       }
+
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      log('Login Success!');
+      NavigationService.navigateTo('/main');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        Fluttertoast.showToast(msg: "Password provided is too weak!");
+      } else if (e.code == 'email-already-in-use') {
+        Fluttertoast.showToast(msg: "Wrong password!");
+      }
+    } catch (e) {
+      log('Error!: $e');
     }
   }
 
