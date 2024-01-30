@@ -22,19 +22,16 @@ class _LoginPageState extends State<LoginPage> {
       final password = _passwordController.text.trim();
       log('Email: $email, Password: $password');
 
-      // empty field handler
       if (email.isEmpty || password.isEmpty) {
         Fluttertoast.showToast(msg: "Please enter your email and password");
         return;
       }
 
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       log('Login Success!');
 
       NavigationService.navigateTo('/main');
     } on FirebaseAuthException catch (e) {
-      //Fluttertoast.showToast(msg: "$e");
       if (e.code == 'invalid-credential') {
         Fluttertoast.showToast(msg: "Invalid credential!");
       }
@@ -57,23 +54,11 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        return null;
-                      },
                       decoration: const InputDecoration(labelText: 'Email'),
                     ),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is incorrect!';
-                        }
-                        return null;
-                      },
                       decoration: const InputDecoration(labelText: 'Password'),
                     ),
                   ],
@@ -83,7 +68,9 @@ class _LoginPageState extends State<LoginPage> {
                 style: ElevatedButton.styleFrom(
                     minimumSize: const Size(200, 40),
                     backgroundColor: Colors.deepOrange),
-                onPressed: _submitForm,
+                onPressed: () {
+                  _submitForm();
+                },
                 child: const Text("Login"),
               ),
               ElevatedButton(

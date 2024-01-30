@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:grade_app/pages/add.dart';
@@ -20,12 +21,48 @@ Future<void> main() async {
   runApp(const App());
 }
 
+// Navigator without build context
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
   static Future<void> navigateTo(String routeName) async {
     await navigatorKey.currentState?.pushNamed(routeName);
+  }
+}
+
+class CheckUser extends StatefulWidget {
+  const CheckUser({super.key});
+  @override
+  State<CheckUser> createState() => _CheckUserState();
+}
+
+class _CheckUserState extends State<CheckUser> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    checkAuth();
+  }
+
+  Future<void> checkAuth() async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      NavigationService.navigateTo("/main");
+    } else {
+      NavigationService.navigateTo("/loginpage");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }
 

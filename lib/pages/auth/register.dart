@@ -28,8 +28,8 @@ class _RegisterPageState extends State<RegisterPage> {
         return;
       }
 
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       log('Login Success!');
       NavigationService.navigateTo('/main');
     } on FirebaseAuthException catch (e) {
@@ -59,25 +59,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        return null;
-                      },
                       decoration: const InputDecoration(labelText: 'Email'),
                     ),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.length < 8) {
-                          return 'Password must be at least 8 characters long';
-                        }
-                        return null;
-                      },
                       decoration: const InputDecoration(labelText: 'Password'),
                     ),
                   ],
@@ -87,7 +73,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: ElevatedButton.styleFrom(
                     minimumSize: const Size(200, 40),
                     backgroundColor: Colors.deepOrange),
-                onPressed: _submitForm,
+                onPressed: () {
+                  _submitForm();
+                },
                 child: const Text("Register"),
               ),
             ],
