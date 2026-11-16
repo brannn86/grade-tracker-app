@@ -24,6 +24,12 @@ class _MainNavigationState extends State<MainNavigation>
     _tabController = TabController(length: 5, vsync: this);
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   void _navigateBottomBar(int index) {
     setState(() {
       selectedPage = index;
@@ -49,6 +55,7 @@ class _MainNavigationState extends State<MainNavigation>
           children: _pages),
       // Home
       bottomNavigationBar: GNav(
+        selectedIndex: selectedPage,
         onTabChange: (selectedPage) => _navigateBottomBar(selectedPage),
         backgroundColor: Colors.white,
         iconSize: 24,

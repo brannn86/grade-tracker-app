@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:grade_app/data/session.dart';
 import 'package:grade_app/main.dart';
+import 'package:grade_app/pages/auth/local_data_upload.dart';
 import 'dart:developer';
 
 class LoginPage extends StatefulWidget {
@@ -12,7 +14,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth get _auth => FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -20,22 +22,39 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
-      log('Email: $email, Password: $password');
 
       if (email.isEmpty || password.isEmpty) {
         Fluttertoast.showToast(msg: "Please enter your email and password");
         return;
       }
 
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
       log('Login Success!');
 
-      NavigationService.navigateTo('/main');
+      await Session.startCloud(credential.user!);
+      if (mounted) await offerLocalDataUpload(context);
+      NavigationService.replaceAllWith('/main');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
         Fluttertoast.showToast(msg: "Invalid credential!");
+      } else {
+        log('Login failed: ${e.code}');
+        Fluttertoast.showToast(msg: "Login failed: ${e.message ?? e.code}");
       }
     }
+  }
+
+  Future<void> _continueWithoutAccount() async {
+    await Session.startLocal();
+    NavigationService.replaceAllWith('/main');
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -81,6 +100,10 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   Navigator.pushNamed(context, '/registerpage');
                 },
+              ),
+              TextButton(
+                onPressed: _continueWithoutAccount,
+                child: const Text("Continue without an account"),
               ),
             ],
           ),

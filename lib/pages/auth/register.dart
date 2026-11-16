@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:grade_app/data/session.dart';
 import 'package:grade_app/main.dart';
+import 'package:grade_app/pages/auth/local_data_upload.dart';
 import 'dart:developer';
 
 class RegisterPage extends StatefulWidget {
@@ -12,7 +14,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth get _auth => FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -20,7 +22,6 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
-      log('Email: $email, Password: $password');
 
       // empty field handler
       if (email.isEmpty || password.isEmpty) {
@@ -28,19 +29,34 @@ class _RegisterPageState extends State<RegisterPage> {
         return;
       }
 
-      await _auth.createUserWithEmailAndPassword(
+      final credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      log('Login Success!');
-      NavigationService.navigateTo('/main');
+      log('Register Success!');
+      await Session.startCloud(credential.user!);
+      if (mounted) await offerLocalDataUpload(context);
+      NavigationService.replaceAllWith('/main');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         Fluttertoast.showToast(msg: "Password provided is too weak!");
       } else if (e.code == 'email-already-in-use') {
-        Fluttertoast.showToast(msg: "Wrong password!");
+        Fluttertoast.showToast(
+            msg: "An account with this email already exists!");
+      } else if (e.code == 'invalid-email') {
+        Fluttertoast.showToast(msg: "Invalid email address!");
+      } else {
+        log('Register failed: ${e.code}');
+        Fluttertoast.showToast(msg: "Register failed: ${e.message ?? e.code}");
       }
     } catch (e) {
       log('Error!: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override

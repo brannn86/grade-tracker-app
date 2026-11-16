@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:grade_app/data/session.dart';
 import 'package:grade_app/pages/add.dart';
 import 'package:grade_app/pages/auth/login.dart';
 import 'package:grade_app/pages/auth/register.dart';
@@ -9,6 +10,7 @@ import 'package:grade_app/pages/home.dart';
 import 'package:grade_app/pages/main_navigation.dart';
 import 'package:grade_app/pages/list.dart';
 import 'package:grade_app/pages/profile.dart';
+import 'package:grade_app/pages/semesters.dart';
 import 'package:grade_app/pages/settings.dart';
 import 'firebase_options.dart';
 
@@ -29,6 +31,12 @@ class NavigationService {
   static Future<void> navigateTo(String routeName) async {
     await navigatorKey.currentState?.pushNamed(routeName);
   }
+
+  // Clears the back stack so the user can't navigate back past auth changes
+  static Future<void> replaceAllWith(String routeName) async {
+    await navigatorKey.currentState
+        ?.pushNamedAndRemoveUntil(routeName, (route) => false);
+  }
 }
 
 class CheckUser extends StatefulWidget {
@@ -47,12 +55,17 @@ class _CheckUserState extends State<CheckUser> {
   }
 
   Future<void> checkAuth() async {
-    User? user = _auth.currentUser;
+    // Wait for Firebase to restore any saved session before deciding
+    User? user = await _auth.authStateChanges().first;
 
     if (user != null) {
-      NavigationService.navigateTo("/main");
+      await Session.startCloud(user);
+      NavigationService.replaceAllWith("/main");
+    } else if (await Session.isLocalModeChosen()) {
+      await Session.startLocal();
+      NavigationService.replaceAllWith("/main");
     } else {
-      NavigationService.navigateTo("/loginpage");
+      NavigationService.replaceAllWith("/loginpage");
     }
   }
 
@@ -74,7 +87,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
+      home: const CheckUser(),
       routes: {
         '/main': (context) => const MainNavigation(),
         '/homepage': (context) => const HomePage(),
@@ -85,6 +98,7 @@ class App extends StatelessWidget {
         '/addpage': (context) => const AddPage(),
         '/listpage': (context) => const ListPage(),
         '/settingspage': (context) => const SettingsPage(),
+        '/semesterspage': (context) => const SemestersPage(),
       },
     );
   }
