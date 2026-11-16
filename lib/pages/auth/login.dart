@@ -12,7 +12,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth get _auth => FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
-      log('Email: $email, Password: $password');
 
       if (email.isEmpty || password.isEmpty) {
         Fluttertoast.showToast(msg: "Please enter your email and password");
@@ -30,12 +29,22 @@ class _LoginPageState extends State<LoginPage> {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       log('Login Success!');
 
-      NavigationService.navigateTo('/main');
+      NavigationService.replaceAllWith('/main');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
         Fluttertoast.showToast(msg: "Invalid credential!");
+      } else {
+        log('Login failed: ${e.code}');
+        Fluttertoast.showToast(msg: "Login failed: ${e.message ?? e.code}");
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
