@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:grade_app/data/session.dart';
 import 'package:grade_app/main.dart';
+import 'package:grade_app/pages/auth/local_data_upload.dart';
 import 'dart:developer';
 
 class LoginPage extends StatefulWidget {
@@ -26,9 +28,12 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final credential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
       log('Login Success!');
 
+      await Session.startCloud(credential.user!);
+      if (mounted) await offerLocalDataUpload(context);
       NavigationService.replaceAllWith('/main');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
@@ -38,6 +43,11 @@ class _LoginPageState extends State<LoginPage> {
         Fluttertoast.showToast(msg: "Login failed: ${e.message ?? e.code}");
       }
     }
+  }
+
+  Future<void> _continueWithoutAccount() async {
+    await Session.startLocal();
+    NavigationService.replaceAllWith('/main');
   }
 
   @override
@@ -90,6 +100,10 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   Navigator.pushNamed(context, '/registerpage');
                 },
+              ),
+              TextButton(
+                onPressed: _continueWithoutAccount,
+                child: const Text("Continue without an account"),
               ),
             ],
           ),

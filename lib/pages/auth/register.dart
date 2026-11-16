@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:grade_app/data/session.dart';
 import 'package:grade_app/main.dart';
+import 'package:grade_app/pages/auth/local_data_upload.dart';
 import 'dart:developer';
 
 class RegisterPage extends StatefulWidget {
@@ -27,9 +29,11 @@ class _RegisterPageState extends State<RegisterPage> {
         return;
       }
 
-      await _auth.createUserWithEmailAndPassword(
+      final credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       log('Register Success!');
+      await Session.startCloud(credential.user!);
+      if (mounted) await offerLocalDataUpload(context);
       NavigationService.replaceAllWith('/main');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
